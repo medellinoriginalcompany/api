@@ -1,0 +1,8 @@
+.vscode/
+
+bin/
+*.exe
+.env
+*.log
+debug.log
+go packages.txt
