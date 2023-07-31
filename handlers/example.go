@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/vnxcius/medellin-api/config"
+	"github.com/medellinoriginalcompany/api/config"
 )
 
 func Example(c *gin.Context) {

@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/vnxcius/medellin-api/config"
+	"github.com/medellinoriginalcompany/api/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

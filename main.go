@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/vnxcius/medellin-api/config"
-	"github.com/vnxcius/medellin-api/database"
-	"github.com/vnxcius/medellin-api/routes"
+	"github.com/medellinoriginalcompany/api/config"
+	"github.com/medellinoriginalcompany/api/database"
+	"github.com/medellinoriginalcompany/api/routes"
 )
 
 func init() {

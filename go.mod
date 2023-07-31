@@ -1,4 +1,4 @@
-module github.com/vnxcius/medellin-api
+module github.com/medellinoriginalcompany/api
 
 go 1.20
 

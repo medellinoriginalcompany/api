@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"github.com/vnxcius/medellin-api/handlers"
+	"github.com/medellinoriginalcompany/api/handlers"
 	"github.com/gin-gonic/gin"
 )
 
