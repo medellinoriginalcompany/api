@@ -12,7 +12,7 @@ var (
 )
 
 func Connection() {
-	//* Fazer a conexão com banco de dados
+	//* Fazer a conexão com banco de dados postgres
 
 	dsn := config.Getenv("DB")
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
