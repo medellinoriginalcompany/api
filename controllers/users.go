@@ -129,3 +129,21 @@ func Login(c *gin.Context) {
 		"token": tokenString,
 	})
 }
+
+func Validate(c *gin.Context) {
+	user, _ := c.Get("user")
+
+	id := user.(models.User).ID // Pegar informação específica do usuário
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": user,
+		"messag":  id,
+	})
+}
+
+func Logout(c *gin.Context) {
+	c.SetCookie("Authorization", "", -1, "", "", true, true)
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Logged out successfully",
+	})
+}
