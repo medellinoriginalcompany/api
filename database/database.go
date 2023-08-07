@@ -2,6 +2,7 @@ package database
 
 import (
 	"github.com/medellinoriginalcompany/api/config"
+	"github.com/medellinoriginalcompany/api/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -20,5 +21,7 @@ func Connection() {
 	if err != nil {
 		panic(err)
 	}
+
+	DB.AutoMigrate(&models.User{}, &models.Product{})
 
 }
