@@ -59,4 +59,3 @@ func RequireAuth(c *gin.Context) {
 	}
 
 }
-

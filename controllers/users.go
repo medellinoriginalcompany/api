@@ -15,16 +15,29 @@ import (
 func Signup(c *gin.Context) {
 	// Pegar info do usuário do corpo da req
 	var body struct {
-		FirstName string
-		LastName  string
+		FullName  string
+		Phone     string
+		CPF       string
 		Email     string
 		Password  string
-		Birth     string
+		BirthDate string
 	}
 
 	if c.Bind(&body) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error:": "Failed to read body",
+			"error": "Failed to read body",
+		})
+
+		return
+	}
+
+	// Verificar se o usuário já existe
+	var user models.User
+	database.DB.First(&user, "email = ?", body.Email)
+
+	if user.ID != 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Email/CPF já cadastrado",
 		})
 
 		return
@@ -35,37 +48,36 @@ func Signup(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error:": "Failed to hash password",
+			"message": "Failed to hash password",
 		})
 		return
 	}
 
-
 	// Criar usuário
-	user := models.User{
-		FirstName: body.FirstName,
-		LastName:  body.LastName,
+	user = models.User{
+		FullName:  body.FullName,
+		Phone:     body.Phone,
+		CPF:       body.CPF,
 		Email:     body.Email,
 		Password:  string(hash),
-		Birth:     body.Birth,
+		BirthDate: body.BirthDate,
 	}
 
 	result := database.DB.Create(&user)
 
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error:": "Failed to create user",
+			"message": "Failed to create user",
 		})
 		return
 	}
 
 	// Respond
 	c.JSON(http.StatusOK, gin.H{
-		"Success": "Account create successfully",
-		"user": &user,
+		"message": "Cadastro realizado com sucesso",
+		"user":    &user,
 	})
 }
-
 
 func Login(c *gin.Context) {
 	// Get email e senha
@@ -76,7 +88,7 @@ func Login(c *gin.Context) {
 
 	if c.Bind(&body) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error:": "Failed to read body",
+			"message": "Failed to read body",
 		})
 
 		return
@@ -87,8 +99,8 @@ func Login(c *gin.Context) {
 	database.DB.First(&user, "email = ?", body.Email)
 
 	if user.ID == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error:": "Invalid email or password",
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Email não cadastrado",
 		})
 
 		return
@@ -98,8 +110,8 @@ func Login(c *gin.Context) {
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error:": "Invalid email or password",
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Senha incorreta",
 		})
 
 		return
@@ -116,16 +128,17 @@ func Login(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error:": "Failed to create token",
+			"message": "Failed to create token",
 		})
 
 		return
 	}
 
-	// Criar cookie com o token de sessão que expira em 30 dias
+	// send it back as response
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", true, true) 
+	c.SetCookie("auth_token", tokenString, 3600*24*60, "", "", true, true) // 2 meses
 	c.JSON(http.StatusOK, gin.H{
+		"user":  user,
 		"token": tokenString,
 	})
 }
@@ -133,17 +146,20 @@ func Login(c *gin.Context) {
 func Validate(c *gin.Context) {
 	user, _ := c.Get("user")
 
-	id := user.(models.User).ID // Pegar informação específica do usuário
+	if user == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message:": "Invalid token",
+		})
+	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": user,
-		"messag":  id,
+		"user": user,
 	})
 }
 
 func Logout(c *gin.Context) {
-	c.SetCookie("Authorization", "", -1, "", "", true, true)
+	c.SetCookie("auth_token", "", -1, "", "", true, true) // Apaga o cookie setando para um tempo negativo
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Logged out successfully",
+		"token": "Cookie deleted.",
 	})
 }

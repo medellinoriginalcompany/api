@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"github.com/medellinoriginalcompany/api/controllers"
 	"github.com/medellinoriginalcompany/api/handlers"
 	"github.com/medellinoriginalcompany/api/middleware"
@@ -13,9 +13,9 @@ func HandleRequest() {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:5173"},
+		AllowOrigins:     []string{"http://localhost:5173"},
 		AllowCredentials: true,
-		AllowHeaders: []string{"Origin, X-Requested-With, Content-Type, Accept"},
+		AllowHeaders:     []string{"Origin, X-Requested-With, Content-Type, Accept"},
 	}))
 
 	r.GET("/example", handlers.Example)
