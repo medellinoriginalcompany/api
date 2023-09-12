@@ -8,15 +8,14 @@ import (
 
 type User struct {
 	//* Entidade usuário
-	ID     int32 `gorm:"primaryKey;"`
+	ID int32 `gorm:"primaryKey;"`
 
-	FirstName string `gorm:"type:varchar(50);notnull"`
-	LastName  string `gorm:"type:varchar(50);notnull"`
+	FullName  string `gorm:"type:varchar(100);notnull"`
 	Email     string `gorm:"type:varchar(50);unique;notnull"`
 	Password  string `gorm:"type:varchar(255);notnull"`
-	Birth     string `gorm:"type:date;notnull"`
-	CPF       string `gorm:"type:varchar(50);notnull"`
-	NumeroCel string `gorm:"type:varchar(20);notnull"`
+	BirthDate string `gorm:"type:date;notnull"`
+	CPF       string `gorm:"type:varchar(11);notnull"`
+	Phone     string `gorm:"type:varchar(11);notnull"`
 	Gender    int8   `gorm:"notnull"`
 
 	Profile_pic string `gorm:"type:varchar(100);default:default_profile.webp;notnull"`
