@@ -146,12 +146,6 @@ func Login(c *gin.Context) {
 func Validate(c *gin.Context) {
 	user, _ := c.Get("user")
 
-	if user == nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message:": "Invalid token",
-		})
-	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"user": user,
 	})

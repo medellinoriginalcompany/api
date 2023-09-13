@@ -22,7 +22,7 @@ func HandleRequest() {
 	r.POST("/registro", controllers.Signup)
 	r.POST("/login", controllers.Login)
 	r.POST("/logout", middleware.RequireAuth, controllers.Logout)
-	r.POST("/validate", middleware.RequireAuth, controllers.Validate)
+	r.POST("/validate", controllers.Validate)
 
 	r.Run()
 }
