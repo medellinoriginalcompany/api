@@ -18,10 +18,15 @@ func HandleRequest() {
 		AllowHeaders:     []string{"Origin, X-Requested-With, Content-Type, Accept"},
 	}))
 
-	r.GET("/example", handlers.Example)
 	r.POST("/registro", controllers.Signup)
 	r.POST("/login", controllers.Login)
 	r.POST("/logout", middleware.RequireAuth, controllers.Logout)
+
+	r.POST("/admin/registro", middleware.RequireAuth, controllers.AdminSignup)
+	r.POST("/admin/login", controllers.AdminLogin)
+	r.POST("/admin/logout", middleware.RequireAuth, controllers.Logout)
+
+	r.GET("/example", handlers.Example)
 	r.POST("/validate", middleware.RequireAuth, controllers.Validate)
 
 	r.Run()
