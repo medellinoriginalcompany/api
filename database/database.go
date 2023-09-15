@@ -22,6 +22,10 @@ func Connection() {
 		panic(err)
 	}
 
-	DB.AutoMigrate(&models.User{}, &models.Product{})
+	DB.AutoMigrate(
+		&models.Admin{},
+		&models.Customer{},
+		&models.Product{},
+	)
 
 }
