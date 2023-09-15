@@ -6,8 +6,8 @@ import (
 	"gorm.io/gorm"
 )
 
-type User struct {
-	//* Entidade usuário
+type Customer struct {
+	//* Entidade de cliente
 	ID int32 `gorm:"primaryKey;"`
 
 	FullName  string `gorm:"type:varchar(100);notnull"`
@@ -21,4 +21,8 @@ type User struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   gorm.DeletedAt `gorm:"index"`
+}
+
+func (Customer) TableName() string {
+	return "users.customers"
 }
