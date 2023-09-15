@@ -18,9 +18,9 @@ type Customer struct {
 	Phone     string `gorm:"type:varchar(11);notnull"`
 	Gender    int8   `gorm:"notnull"`
 
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	DeletedAt   gorm.DeletedAt `gorm:"index"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
 func (Customer) TableName() string {

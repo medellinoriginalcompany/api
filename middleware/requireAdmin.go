@@ -16,7 +16,8 @@ import (
 
 func RequireAdmin(c *gin.Context) {
 	// Get cookie off request
-	tokenString, err := c.Cookie("auth_token")
+	cookie := config.Getenv("ADMIN_TOKEN")
+	tokenString, err := c.Cookie(cookie)
 
 	if err != nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
