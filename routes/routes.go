@@ -22,9 +22,9 @@ func HandleRequest() {
 	r.POST("/login", controllers.Login)
 	r.POST("/logout", middleware.RequireAuth, controllers.Logout)
 
-	r.POST("/admin/registro", middleware.RequireAuth, controllers.AdminSignup)
+	r.POST("/admin/registro", middleware.RequireAdmin, controllers.AdminSignup)
 	r.POST("/admin/login", controllers.AdminLogin)
-	r.POST("/admin/logout", middleware.RequireAuth, controllers.Logout)
+	r.POST("/admin/logout", middleware.RequireAdmin, controllers.Logout)
 
 	r.GET("/example", handlers.Example)
 	r.POST("/validate", middleware.RequireAuth, controllers.Validate)
