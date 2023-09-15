@@ -18,6 +18,8 @@ func RequireAuth(c *gin.Context) {
 
 	if err != nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
+
+		return
 	}
 
 	//Decode/validate it
@@ -38,14 +40,18 @@ func RequireAuth(c *gin.Context) {
 		//check the expiration
 		if float64(time.Now().Unix()) > claims["exp"].(float64) {
 			c.AbortWithStatus(http.StatusUnauthorized)
+
+			return
 		}
 
 		//find user with token
-		var user models.User
+		var user models.Customer
 		database.DB.First(&user, claims["sub"])
 
 		if user.ID == 0 {
 			c.AbortWithStatus(http.StatusUnauthorized)
+
+			return
 		}
 
 		//attach to req
@@ -56,6 +62,8 @@ func RequireAuth(c *gin.Context) {
 
 	} else {
 		c.AbortWithStatus(http.StatusUnauthorized)
+
+		return
 	}
 
 }
