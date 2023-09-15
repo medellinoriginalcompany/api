@@ -67,7 +67,7 @@ func Signup(c *gin.Context) {
 
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Failed to create user",
+			"message": "Erro ao criar usuário",
 		})
 		return
 	}
@@ -158,6 +158,14 @@ func Logout(c *gin.Context) {
 	})
 }
 
+func AdminLogout(c *gin.Context) {
+	cookie := config.Getenv("ADMIN_TOKEN")
+	c.SetCookie(cookie, "", -1, "", "", true, true) // Apaga o cookie setando para um tempo negativo
+	c.JSON(http.StatusOK, gin.H{
+		"token": "Cookie deleted.",
+	})
+}
+
 func AdminLogin(c *gin.Context) {
 	// Get email e senha
 	var body struct {
@@ -215,7 +223,8 @@ func AdminLogin(c *gin.Context) {
 
 	// send it back as response
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("auth_token", tokenString, 3600*24*7, "", "", true, true) // 1 semana
+	cookie := config.Getenv("ADMIN_TOKEN")
+	c.SetCookie(cookie, tokenString, 3600*24*7, "", "", true, true) // 1 semana
 	c.JSON(http.StatusOK, gin.H{
 		"user":  user,
 		"token": tokenString,
