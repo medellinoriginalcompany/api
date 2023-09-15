@@ -18,7 +18,6 @@ type User struct {
 	Phone     string `gorm:"type:varchar(11);notnull"`
 	Gender    int8   `gorm:"notnull"`
 
-	Profile_pic string `gorm:"type:varchar(100);default:default_profile.webp;notnull"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   gorm.DeletedAt `gorm:"index"`
