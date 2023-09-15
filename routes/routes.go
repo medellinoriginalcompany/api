@@ -13,7 +13,10 @@ func HandleRequest() {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowOrigins:     []string{
+			"http://localhost:5173",
+			"http://localhost:5174",
+		},
 		AllowCredentials: true,
 		AllowHeaders:     []string{"Origin, X-Requested-With, Content-Type, Accept"},
 	}))
@@ -24,10 +27,12 @@ func HandleRequest() {
 
 	r.POST("/admin/registro", middleware.RequireAdmin, controllers.AdminSignup)
 	r.POST("/admin/login", controllers.AdminLogin)
-	r.POST("/admin/logout", middleware.RequireAdmin, controllers.Logout)
+	r.POST("/admin/logout", middleware.RequireAdmin, controllers.AdminLogout)
+	r.POST("/admin/cadastrar-produto", middleware.RequireAdmin, controllers.AddProduct)
 
 	r.GET("/example", handlers.Example)
 	r.POST("/validate", middleware.RequireAuth, controllers.Validate)
+	r.POST("/admin/validate", middleware.RequireAdmin, controllers.Validate)
 
 	r.Run()
 }
