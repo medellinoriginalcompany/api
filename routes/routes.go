@@ -29,6 +29,12 @@ func HandleRequest() {
 	r.POST("/admin/login", controllers.AdminLogin)
 	r.POST("/admin/logout", middleware.RequireAdmin, controllers.AdminLogout)
 	r.POST("/admin/cadastrar-produto", middleware.RequireAdmin, controllers.AddProduct)
+	r.POST("/admin/cadastrar-categoria", middleware.RequireAdmin, controllers.AddCategory)
+
+	r.GET("/produtos", middleware.RequireAdmin, controllers.GetProducts)
+	r.GET("/admin/categories", middleware.RequireAdmin, controllers.GetCategories)
+	r.GET("/admin/sizes", middleware.RequireAdmin, controllers.GetSizes)
+	r.GET("/admin/types", middleware.RequireAdmin, controllers.GetTypes)
 
 	r.GET("/example", handlers.Example)
 	r.POST("/validate", middleware.RequireAuth, controllers.Validate)
