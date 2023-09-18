@@ -187,7 +187,7 @@ func AdminLogin(c *gin.Context) {
 
 	if user.ID == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Email não cadastrado",
+			"message": "Email ou senha incorretos",
 		})
 
 		return
@@ -198,7 +198,7 @@ func AdminLogin(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Senha incorreta",
+			"message": "Email ou senha incorretos",
 		})
 
 		return
