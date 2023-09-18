@@ -19,6 +19,7 @@ func AddProduct(c *gin.Context) {
 		Active      bool
 		Discount    float32
 		Banner      string
+		TypeID      int32
 		CategoryID  int32
 		SizeID      int32
 	}
@@ -53,6 +54,7 @@ func AddProduct(c *gin.Context) {
 		Active:      body.Active,
 		Discount:    body.Discount,
 		Banner:      body.Banner,
+		TypeID:      body.TypeID,
 		CategoryID:  body.CategoryID,
 		SizeID:      body.SizeID,
 	}
@@ -70,5 +72,15 @@ func AddProduct(c *gin.Context) {
 	// Respond
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Produto criado com sucesso",
+	})
+}
+
+func GetProducts(c *gin.Context) {
+	var products []models.Product
+
+	database.DB.Preload("Type").Preload("Category").Preload("Size").Find(&products)
+
+	c.JSON(http.StatusOK, gin.H{
+		"products": &products,
 	})
 }

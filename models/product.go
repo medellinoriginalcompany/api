@@ -22,11 +22,14 @@ type Product struct {
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 
-	CategoryID int32    `gorm:"notnull"`
+	TypeID int32       `gorm:"notnull"`
+	Type   ProductType `gorm:"foreignKey:TypeID"`
+
+	CategoryID int32           `gorm:"notnull"`
 	Category   ProductCategory `gorm:"foreignKey:CategoryID"`
 
-	SizeID int32 `gorm:"notnull"`
-	Size   ProductSize  `gorm:"foreignKey:SizeID"`
+	SizeID int32       `gorm:"notnull"`
+	Size   ProductSize `gorm:"foreignKey:SizeID"`
 }
 
 func (Product) TableName() string {
