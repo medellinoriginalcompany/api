@@ -13,7 +13,7 @@ type Product struct {
 	Description string  `gorm:"type:varchar(255);notnull"`
 	SKU         string  `gorm:"type:varchar(50);unique;notnull"`
 	Price       float32 `gorm:"notnull"`
-	Stock       int32   `gorm:"notnull"`
+	Stock       int32   `gorm:"notnull;default:0"`
 	Active      bool    `gorm:"notnull;default:true"`
 	Discount    float32 `gorm:"notnull"`
 	Banner      string  `gorm:"type:varchar(255);notnull"`
@@ -30,6 +30,9 @@ type Product struct {
 
 	SizeID int32       `gorm:"notnull"`
 	Size   ProductSize `gorm:"foreignKey:SizeID"`
+
+	ColorID int32       `gorm:"notnull"`
+	Color   ProductColor `gorm:"foreignKey:ColorID"`
 }
 
 func (Product) TableName() string {

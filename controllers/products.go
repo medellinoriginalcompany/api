@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/medellinoriginalcompany/api/database"
@@ -11,22 +12,22 @@ import (
 func AddProduct(c *gin.Context) {
 	// Pegar info do produto do corpo da req
 	var body struct {
-		Name        string
-		Description string
-		SKU         string
-		Price       float32
-		Stock       int32
-		Active      bool
-		Discount    float32
-		Banner      string
-		TypeID      int32
-		CategoryID  int32
-		SizeID      int32
+		Name        string  `json:"name"`
+		Description string  `json:"description"`
+		SKU         string  `json:"sku"`
+		Price       string `json:"price"`
+		Active      bool    `json:"active"`
+		Banner      string  `json:"banner"`
+		Type        string  `json:"type"`
+		Category    string  `json:"category"`
+		Size        string  `json:"size"`
+		Color       string  `json:"color"`
 	}
 
 	if c.Bind(&body) != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "Failed to read body",
+			"body":    body,
 		})
 
 		return
@@ -44,19 +45,73 @@ func AddProduct(c *gin.Context) {
 		return
 	}
 
+	var productColor models.ProductColor
+	database.DB.First(productColor, "name = ?", body.Color)
+
+	if productColor.ID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Cor não cadastrada",
+		})
+
+		return
+	}
+
+	var productType models.ProductType
+	database.DB.First(productType, "name = ?", body.Type)
+
+	if productType.ID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Tipo não cadastrado",
+		})
+
+		return
+	}
+
+	var productCategory models.ProductCategory
+	database.DB.First(productCategory, "name = ?", body.Category)
+
+	if productCategory.ID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Categoria não cadastrado",
+		})
+
+		return
+	}
+
+	var productSize models.ProductSize
+	database.DB.First(productSize, "name = ?", body.Size)
+
+	if productSize.ID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Tamanho não cadastrado",
+		})
+
+		return
+	}
+
+	// Converter string preço para float
+	price, err := strconv.ParseFloat(body.Price, 32)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Failed to parse price",
+		})
+
+		return
+	}
+
 	// Criar produto
 	product = models.Product{
 		Name:        body.Name,
 		Description: body.Description,
 		SKU:         body.SKU,
-		Price:       body.Price,
-		Stock:       body.Stock,
+		Price:       float32(price),
 		Active:      body.Active,
-		Discount:    body.Discount,
 		Banner:      body.Banner,
-		TypeID:      body.TypeID,
-		CategoryID:  body.CategoryID,
-		SizeID:      body.SizeID,
+		TypeID:      productType.ID,
+		CategoryID:  productCategory.ID,
+		SizeID:      productSize.ID,
+		ColorID:     productColor.ID,
 	}
 
 	result := database.DB.Create(&product)
