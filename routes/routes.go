@@ -34,7 +34,7 @@ func HandleRequest() {
 	r.POST("/admin/cadastrar-tipo", middleware.RequireAdmin, controllers.AddType)
 	r.POST("/admin/cadastrar-cor", middleware.RequireAdmin, controllers.AddColor)
 
-	r.GET("/admin/produtos", middleware.RequireAdmin, controllers.GetProducts)
+	r.GET("/admin/products", middleware.RequireAdmin, controllers.GetProducts)
 	r.GET("/admin/categories", middleware.RequireAdmin, controllers.GetCategories)
 	r.GET("/admin/sizes", middleware.RequireAdmin, controllers.GetSizes)
 	r.GET("/admin/types", middleware.RequireAdmin, controllers.GetTypes)

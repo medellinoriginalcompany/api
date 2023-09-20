@@ -46,7 +46,7 @@ func AddProduct(c *gin.Context) {
 	}
 
 	var productColor models.ProductColor
-	database.DB.First(productColor, "name = ?", body.Color)
+	database.DB.First(&productColor, "name = ?", body.Color)
 
 	if productColor.ID == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -57,7 +57,7 @@ func AddProduct(c *gin.Context) {
 	}
 
 	var productType models.ProductType
-	database.DB.First(productType, "name = ?", body.Type)
+	database.DB.First(&productType, "name = ?", body.Type)
 
 	if productType.ID == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -68,7 +68,7 @@ func AddProduct(c *gin.Context) {
 	}
 
 	var productCategory models.ProductCategory
-	database.DB.First(productCategory, "name = ?", body.Category)
+	database.DB.First(&productCategory, "name = ?", body.Category)
 
 	if productCategory.ID == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -79,7 +79,7 @@ func AddProduct(c *gin.Context) {
 	}
 
 	var productSize models.ProductSize
-	database.DB.First(productSize, "name = ?", body.Size)
+	database.DB.First(&productSize, "name = ?", body.Size)
 
 	if productSize.ID == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -133,7 +133,8 @@ func AddProduct(c *gin.Context) {
 func GetProducts(c *gin.Context) {
 	var products []models.Product
 
-	database.DB.Preload("Type").Preload("Category").Preload("Size").Find(&products)
+	// Pegar produtos
+	database.DB.Joins("Type").Joins("Category").Joins("Size").Joins("Color").Find(&products)
 
 	c.JSON(http.StatusOK, gin.H{
 		"products": &products,
