@@ -140,3 +140,23 @@ func GetProducts(c *gin.Context) {
 		"products": &products,
 	})
 }
+
+func 	DeleteProduct(c *gin.Context) {
+	// Pegar id do produto
+	id := c.Param("id")
+
+	// Deletar produto
+	response := database.DB.Delete(&models.Product{}, "id = ?", &id)
+
+	if response.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Erro ao deletar produto",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Produto deletado com sucesso",
+	})
+}
