@@ -23,9 +23,16 @@ func Connection() {
 	}
 
 	DB.AutoMigrate(
+		// Migrar todas as tabelas
 		&models.Admin{},
 		&models.Customer{},
 		&models.Product{},
+		&models.ProductType{},
+		&models.ProductCategory{},
+		&models.ProductSize{},
+		&models.ProductColor{},
+		&models.ProductImage{},
 	)
+
 
 }
