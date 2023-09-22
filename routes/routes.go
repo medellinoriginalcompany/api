@@ -18,7 +18,8 @@ func HandleRequest() {
 			"http://localhost:5174",
 		},
 		AllowCredentials: true,
-		AllowHeaders:     []string{"Origin, X-Requested-With, Content-Type, Accept"},
+		AllowHeaders:     []string{"Content-Type, Access-Control-Allow-Origin, Access-Control-Allow-Headers, X-Requested-With"},
+		AllowMethods:     []string{"GET, POST, PUT, DELETE, OPTIONS"},
 	}))
 
 	r.POST("/registro", controllers.Signup)
@@ -39,6 +40,12 @@ func HandleRequest() {
 	r.GET("/admin/sizes", middleware.RequireAdmin, controllers.GetSizes)
 	r.GET("/admin/types", middleware.RequireAdmin, controllers.GetTypes)
 	r.GET("/admin/colors", middleware.RequireAdmin, controllers.GetColors)
+	
+	r.DELETE("/admin/delete-product/:id", middleware.RequireAdmin, controllers.DeleteProduct)
+	// r.POST("/admin/delete-category", middleware.RequireAdmin, controllers.DeleteCategory)
+	// r.POST("/admin/delete-size", middleware.RequireAdmin, controllers.DeleteSize)
+	// r.POST("/admin/delete-type", middleware.RequireAdmin, controllers.DeleteType)
+	// r.POST("/admin/delete-color", middleware.RequireAdmin, controllers.DeleteColor)
 
 	r.GET("/example", handlers.Example)
 	r.POST("/validate", middleware.RequireAuth, controllers.Validate)
