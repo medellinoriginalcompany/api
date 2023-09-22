@@ -33,6 +33,8 @@ type Product struct {
 
 	ColorID int32       `gorm:"notnull"`
 	Color   ProductColor `gorm:"foreignKey:ColorID"`
+
+	Images []ProductImage `gorm:"foreignKey:ProductID"`
 }
 
 func (Product) TableName() string {
