@@ -15,10 +15,10 @@ func GetProductProperties(c *gin.Context) {
 	var sizes []models.ProductSize
 	var types []models.ProductType
 
-	database.DB.Find(&categories, "deleted_at IS NULL")
-	database.DB.Find(&colors, "deleted_at IS NULL")
-	database.DB.Find(&sizes, "deleted_at IS NULL")
-	database.DB.Find(&types, "deleted_at IS NULL")
+	database.DB.Order("name ASC").Find(&categories)
+	database.DB.Order("name ASC").Find(&colors)
+	database.DB.Order("name ASC").Find(&types)
+	database.DB.Order("name ASC").Find(&sizes)
 
 	c.JSON(http.StatusOK, gin.H{
 		"categories": categories,
