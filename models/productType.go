@@ -9,8 +9,8 @@ import (
 type ProductType struct {
 	ID int32 `gorm:"primaryKey;"`
 
-	Name        string `gorm:"type:varchar(255);notnull"`
-	Description string `gorm:"type:varchar(255);notnull"`
+	Name        string `gorm:"type:varchar(255);notnull;unique;"`
+	Description string `gorm:"type:varchar(255);"`
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
