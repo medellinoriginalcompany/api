@@ -26,30 +26,27 @@ func HandleRequest() {
 	r.POST("/login", controllers.Login)
 	r.POST("/logout", middleware.RequireAuth, controllers.Logout)
 
+	r.POST("/validate", middleware.RequireAuth, controllers.Validate)
+	r.POST("/admin/validate", middleware.RequireAdmin, controllers.Validate)
+
 	r.POST("/admin/registro", middleware.RequireAdmin, controllers.AdminSignup)
 	r.POST("/admin/login", controllers.AdminLogin)
 	r.POST("/admin/logout", middleware.RequireAdmin, controllers.AdminLogout)
 	r.POST("/admin/cadastrar-produto", middleware.RequireAdmin, controllers.AddProduct)
-	r.POST("/admin/cadastrar-categoria", middleware.RequireAdmin, controllers.AddCategory)
-	r.POST("/admin/cadastrar-tamanho", middleware.RequireAdmin, controllers.AddSize)
-	r.POST("/admin/cadastrar-tipo", middleware.RequireAdmin, controllers.AddType)
-	r.POST("/admin/cadastrar-cor", middleware.RequireAdmin, controllers.AddColor)
-
+	
 	r.GET("/admin/products", middleware.RequireAdmin, controllers.GetProducts)
-	r.GET("/admin/categories", middleware.RequireAdmin, controllers.GetCategories)
-	r.GET("/admin/sizes", middleware.RequireAdmin, controllers.GetSizes)
-	r.GET("/admin/types", middleware.RequireAdmin, controllers.GetTypes)
-	r.GET("/admin/colors", middleware.RequireAdmin, controllers.GetColors)
+	r.GET("/admin/products/properties", middleware.RequireAdmin, controllers.GetProductProperties)
+
+	r.POST("/admin/products/add-property/tamanhos", middleware.RequireAdmin, controllers.AddProductSize)
+	r.POST("/admin/products/add-property/cores", middleware.RequireAdmin, controllers.AddProductColor)
+	r.POST("/admin/products/add-property/categorias", middleware.RequireAdmin, controllers.AddProductCategory)
+	r.POST("/admin/products/add-property/tipos", middleware.RequireAdmin, controllers.AddProductType)
 	
 	r.DELETE("/admin/delete-product/:id", middleware.RequireAdmin, controllers.DeleteProduct)
-	// r.POST("/admin/delete-category", middleware.RequireAdmin, controllers.DeleteCategory)
-	// r.POST("/admin/delete-size", middleware.RequireAdmin, controllers.DeleteSize)
-	// r.POST("/admin/delete-type", middleware.RequireAdmin, controllers.DeleteType)
-	// r.POST("/admin/delete-color", middleware.RequireAdmin, controllers.DeleteColor)
+	r.DELETE(("/admin/delete/:type/:id"), middleware.RequireAdmin, controllers.DeleteProductProperty)
 
 	r.GET("/example", handlers.Example)
-	r.POST("/validate", middleware.RequireAuth, controllers.Validate)
-	r.POST("/admin/validate", middleware.RequireAdmin, controllers.Validate)
+
 
 	r.Run()
 }
