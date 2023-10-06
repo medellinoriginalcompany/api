@@ -53,7 +53,16 @@ func DeleteProductProperty(c *gin.Context) {
 		return
 	}
 
-	database.DB.Unscoped().Delete(&property, "id = ?", &id)
+	result := database.DB.Unscoped().Delete(&property, "id = ?", &id)
+
+	if result.Error != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Erro ao deletar propriedade",
+			"error":   result.Error.Error(),
+		})
+
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Propriedade deletada com sucesso",
