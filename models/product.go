@@ -22,17 +22,14 @@ type Product struct {
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 
-	TypeID int32       `gorm:"notnull"`
-	Type   ProductType `gorm:"foreignKey:TypeID"`
-
-	CategoryID int32           `gorm:"notnull"`
-	Category   ProductCategory `gorm:"foreignKey:CategoryID"`
-
-	SizeID int32       `gorm:"notnull"`
-	Size   ProductSize `gorm:"foreignKey:SizeID"`
-
-	ColorID int32       `gorm:"notnull"`
-	Color   ProductColor `gorm:"foreignKey:ColorID"`
+	TypeID     int32
+	CategoryID int32
+	SizeID     int32
+	ColorID    int32
+	Type       ProductType     `gorm:"foreignKey:TypeID;constraint:OnDelete:SET NULL;"`
+	Category   ProductCategory `gorm:"foreignKey:CategoryID;constraint:OnDelete:SET NULL;"`
+	Size       ProductSize     `gorm:"foreignKey:SizeID;constraint:OnDelete:SET NULL;"`
+	Color      ProductColor    `gorm:"foreignKey:ColorID;constraint:OnDelete:SET NULL;"`
 
 	Images []ProductImage `gorm:"foreignKey:ProductID"`
 }
