@@ -134,7 +134,7 @@ func GetProducts(c *gin.Context) {
 	var products []models.Product
 
 	// Pegar produtos
-	database.DB.Joins("Type").Joins("Category").Joins("Size").Joins("Color").Find(&products)
+	database.DB.Find(&products)
 
 	c.JSON(http.StatusOK, gin.H{
 		"products": &products,
