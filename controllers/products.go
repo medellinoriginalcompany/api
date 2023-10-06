@@ -12,16 +12,16 @@ import (
 func AddProduct(c *gin.Context) {
 	// Pegar info do produto do corpo da req
 	var body struct {
-		Name        string  `json:"name"`
-		Description string  `json:"description"`
-		SKU         string  `json:"sku"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
+		SKU         string `json:"sku"`
 		Price       string `json:"price"`
-		Active      bool    `json:"active"`
-		Banner      string  `json:"banner"`
-		Type        string  `json:"type"`
-		Category    string  `json:"category"`
-		Size        string  `json:"size"`
-		Color       string  `json:"color"`
+		Active      bool   `json:"active"`
+		Banner      string `json:"banner"`
+		Type        string `json:"type"`
+		Category    string `json:"category"`
+		Size        string `json:"size"`
+		Color       string `json:"color"`
 	}
 
 	if c.Bind(&body) != nil {
@@ -141,7 +141,28 @@ func GetProducts(c *gin.Context) {
 	})
 }
 
-func 	DeleteProduct(c *gin.Context) {
+func GetProduct(c *gin.Context) {
+	// Pegar id do produto
+	id := c.Param("id")
+
+	// Pegar produto
+	var product models.Product
+	database.DB.Joins("Type").Joins("Category").Joins("Size").Joins("Color").First(&product, "products.id = ?", &id)
+
+	if product.ID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Produto não encontrado",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"product": &product,
+	})
+}
+
+func DeleteProduct(c *gin.Context) {
 	// Pegar id do produto
 	id := c.Param("id")
 
