@@ -172,6 +172,7 @@ func DeleteProduct(c *gin.Context) {
 	if response.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Erro ao deletar produto",
+			"error":   response.Error.Error(),
 		})
 
 		return
@@ -179,5 +180,54 @@ func DeleteProduct(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Produto deletado com sucesso",
+	})
+}
+
+func GetDeletedProducts(c *gin.Context) {
+	var products []models.Product
+
+	// Pegar produtos deletados
+	response := database.DB.Unscoped().Where("deleted_at IS NOT NULL").Find(&products)
+
+	if response.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Erro ao pegar produtos deletados",
+			"error":   response.Error.Error(),
+		})
+
+		return
+	}
+	
+	if len(products) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "Nenhum produto deletado foi encontrado",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"products": &products,
+	})
+}
+
+func PermaDeleteProdutct(c *gin.Context) {
+	// Pegar id do produto
+	id := c.Param("id")
+
+	// Deletar permanentemente produto
+	response := database.DB.Unscoped().Delete(&models.Product{}, "id = ?", &id)
+
+	if response.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Erro ao deletar produto",
+			"error":   response.Error.Error(),
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Produto deletado permanente com sucesso",
 	})
 }
