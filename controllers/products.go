@@ -211,7 +211,7 @@ func GetDeletedProducts(c *gin.Context) {
 	})
 }
 
-func PermaDeleteProdutct(c *gin.Context) {
+func PermaDeleteProduct(c *gin.Context) {
 	// Pegar id do produto
 	id := c.Param("id")
 
