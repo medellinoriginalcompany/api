@@ -38,6 +38,7 @@ func HandleRequest() {
 	r.POST("/admin/produtos/adicionar-propriedade/cores", middleware.RequireAdmin, controllers.AddProductColor)
 	r.POST("/admin/produtos/adicionar-propriedade/categorias", middleware.RequireAdmin, controllers.AddProductCategory)
 	r.POST("/admin/produtos/adicionar-propriedade/tipos", middleware.RequireAdmin, controllers.AddProductType)
+	r.POST("/admin/produtos/restaurar/:id", middleware.RequireAdmin, controllers.RestoreProduct)
 
 	r.GET("/admin/produtos", middleware.RequireAdmin, controllers.GetProducts)
 	r.GET("/admin/produto/:id", middleware.RequireAdmin, controllers.GetProduct)

@@ -266,3 +266,25 @@ func PermaDeleteProduct(c *gin.Context) {
 		"message": "Produto e imagem deletados permanentemente com sucesso",
 	})
 }
+
+func RestoreProduct(c *gin.Context) {
+	// Pegar id do produto
+	id := c.Param("id")
+
+	// Restaurar produto
+	response := database.DB.Unscoped().Model(&models.Product{}).Where("id = ?", &id).Update("deleted_at", nil)
+
+	if response.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Erro ao restaurar produto",
+			"error":   response.Error.Error(),
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Produto restaurado com sucesso",
+	})
+}
+
