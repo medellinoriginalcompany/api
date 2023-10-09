@@ -4,7 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/cloudinary/cloudinary-go/v2/api/admin"
 	"github.com/gin-gonic/gin"
+	"github.com/medellinoriginalcompany/api/config"
 	"github.com/medellinoriginalcompany/api/database"
 	"github.com/medellinoriginalcompany/api/models"
 )
@@ -197,7 +199,7 @@ func GetDeletedProducts(c *gin.Context) {
 
 		return
 	}
-	
+
 	if len(products) == 0 {
 		c.JSON(http.StatusNotFound, gin.H{
 			"message": "Nenhum produto deletado foi encontrado",
@@ -214,9 +216,11 @@ func GetDeletedProducts(c *gin.Context) {
 func PermaDeleteProduct(c *gin.Context) {
 	// Pegar id do produto
 	id := c.Param("id")
+	cld, ctx := config.Credentials()
+	var product models.Product
 
 	// Deletar permanentemente produto
-	response := database.DB.Unscoped().Delete(&models.Product{}, "id = ?", &id)
+	response := database.DB.Unscoped().Delete(&product, "id = ?", &id)
 
 	if response.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -227,7 +231,31 @@ func PermaDeleteProduct(c *gin.Context) {
 		return
 	}
 
+	// Deletar imagem do Cloudinary
+	res, err := cld.Admin.DeleteAssets(ctx, admin.DeleteAssetsParams{
+		PublicIDs:    []string{product.Banner},
+		DeliveryType: "upload",
+		AssetType:    "image",
+	})
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Erro ao deletar imagem do Cloudinary. Produto deletado com sucesso",
+			"error":   err.Error(),
+		})
+
+		return
+	}
+
+	if res.Deleted == nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Erro ao deletar imagem do Cloudinary. Produto deletado com sucesso",
+		})
+
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Produto deletado permanente com sucesso",
+		"message": "Produto e imagem deletados permanentemente com sucesso",
 	})
 }
