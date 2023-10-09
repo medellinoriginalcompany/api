@@ -8,6 +8,7 @@ import (
 
 func init() {
 	config.Loadenv()      // Carregar .env variables
+	config.Credentials()	// Carregar credenciais do Cloudinary
 	database.Connection() // Conectar a database
 }
 
