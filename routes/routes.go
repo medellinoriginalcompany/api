@@ -25,15 +25,15 @@ func HandleRequest() {
 	r.POST("/registro", controllers.Signup)
 	r.POST("/login", controllers.Login)
 	r.POST("/logout", middleware.RequireAuth, controllers.Logout)
-
-	r.POST("/validar", middleware.RequireAuth, controllers.Validate)
-	r.POST("/admin/validar", middleware.RequireAdmin, controllers.Validate)
-
+	
 	r.POST("/admin/registro", middleware.RequireAdmin, controllers.AdminSignup)
 	r.POST("/admin/login", controllers.AdminLogin)
 	r.POST("/admin/logout", middleware.RequireAdmin, controllers.AdminLogout)
-	r.POST("/admin/cadastrar-produto", middleware.RequireAdmin, controllers.AddProduct)
+
+	r.POST("/validar", middleware.RequireAuth, controllers.Validate)
+	r.POST("/admin/validar", middleware.RequireAdmin, controllers.Validate)
 	
+	r.POST("/admin/cadastrar-produto", middleware.RequireAdmin, controllers.AddProduct)
 	r.POST("/admin/produtos/adicionar-propriedade/tamanhos", middleware.RequireAdmin, controllers.AddProductSize)
 	r.POST("/admin/produtos/adicionar-propriedade/cores", middleware.RequireAdmin, controllers.AddProductColor)
 	r.POST("/admin/produtos/adicionar-propriedade/categorias", middleware.RequireAdmin, controllers.AddProductCategory)
@@ -45,6 +45,7 @@ func HandleRequest() {
 	r.GET("/admin/produtos/lixeira", middleware.RequireAdmin, controllers.GetDeletedProducts)
 	
 	r.DELETE("/admin/deletar-produto/:id", middleware.RequireAdmin, controllers.DeleteProduct)
+	r.DELETE("/admin/produtos/deletar-permanente/:id", middleware.RequireAdmin, controllers.PermaDeleteProduct)
 	r.DELETE("/admin/deletar/:type/:id", middleware.RequireAdmin, controllers.DeleteProductProperty)
 
 	r.GET("/example", handlers.Example)
