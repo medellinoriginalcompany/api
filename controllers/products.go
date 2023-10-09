@@ -164,27 +164,6 @@ func GetProduct(c *gin.Context) {
 	})
 }
 
-func DeleteProduct(c *gin.Context) {
-	// Pegar id do produto
-	id := c.Param("id")
-
-	// Deletar produto
-	response := database.DB.Delete(&models.Product{}, "id = ?", &id)
-
-	if response.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Erro ao deletar produto",
-			"error":   response.Error.Error(),
-		})
-
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Produto deletado com sucesso",
-	})
-}
-
 func GetDeletedProducts(c *gin.Context) {
 	var products []models.Product
 
@@ -213,11 +192,37 @@ func GetDeletedProducts(c *gin.Context) {
 	})
 }
 
+func DeleteProduct(c *gin.Context) {
+	// Pegar id do produto
+	id := c.Param("id")
+
+	// Deletar produto
+	response := database.DB.Delete(&models.Product{}, "id = ?", &id)
+
+	if response.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Erro ao deletar produto",
+			"error":   response.Error.Error(),
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Produto deletado com sucesso",
+	})
+}
+
 func PermaDeleteProduct(c *gin.Context) {
 	// Pegar id do produto
 	id := c.Param("id")
 	cld, ctx := config.Credentials()
 	var product models.Product
+
+	// Pegar produto
+	database.DB.Unscoped().First(&product, "id = ?", &id)
+
+	productBanner := product.Banner
 
 	// Deletar permanentemente produto
 	response := database.DB.Unscoped().Delete(&product, "id = ?", &id)
@@ -231,9 +236,10 @@ func PermaDeleteProduct(c *gin.Context) {
 		return
 	}
 
+
 	// Deletar imagem do Cloudinary
 	res, err := cld.Admin.DeleteAssets(ctx, admin.DeleteAssetsParams{
-		PublicIDs:    []string{product.Banner},
+		PublicIDs:    []string{productBanner},
 		DeliveryType: "upload",
 		AssetType:    "image",
 	})
@@ -250,6 +256,7 @@ func PermaDeleteProduct(c *gin.Context) {
 	if res.Deleted == nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Erro ao deletar imagem do Cloudinary. Produto deletado com sucesso",
+			"error": res.Error.Message,
 		})
 
 		return
