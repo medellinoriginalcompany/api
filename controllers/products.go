@@ -14,16 +14,18 @@ import (
 func AddProduct(c *gin.Context) {
 	// Pegar info do produto do corpo da req
 	var body struct {
-		Name        string `json:"name"`
-		Description string `json:"description"`
-		SKU         string `json:"sku"`
-		Price       string `json:"price"`
-		Active      bool   `json:"active"`
-		Banner      string `json:"banner"`
-		Type        string `json:"type"`
-		Category    string `json:"category"`
-		Size        string `json:"size"`
-		Color       string `json:"color"`
+		Name            string `json:"name"`
+		Description     string `json:"description"`
+		SKU             string `json:"sku"`
+		Price           string `json:"price"`
+		Stock           string `json:"stock"`
+		Active          bool   `json:"active"`
+		DiscountedPrice string `json:"discountedPrice"`
+		Banner          string `json:"banner"`
+		Type            string `json:"type"`
+		Category        string `json:"category"`
+		Size            string `json:"size"`
+		Color           string `json:"color"`
 	}
 
 	if c.Bind(&body) != nil {
@@ -53,6 +55,7 @@ func AddProduct(c *gin.Context) {
 	if productColor.ID == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "Cor não cadastrada",
+			"body":    body,
 		})
 
 		return
@@ -64,6 +67,7 @@ func AddProduct(c *gin.Context) {
 	if productType.ID == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "Tipo não cadastrado",
+			"body":    body,
 		})
 
 		return
@@ -75,6 +79,7 @@ func AddProduct(c *gin.Context) {
 	if productCategory.ID == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "Categoria não cadastrado",
+			"body":    body,
 		})
 
 		return
@@ -86,17 +91,21 @@ func AddProduct(c *gin.Context) {
 	if productSize.ID == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "Tamanho não cadastrado",
+			"body":    body,
 		})
 
 		return
 	}
 
-	// Converter string preço para float
-	price, err := strconv.ParseFloat(body.Price, 32)
+	// Converter strings para float/int
+	price, err1 := strconv.ParseFloat(body.Price, 32)
+	stock, err2 := strconv.ParseInt(body.Stock, 10, 32)
+	discountedPrice, err3 := strconv.ParseFloat(body.DiscountedPrice, 32)
 
-	if err != nil {
+
+	if err1 != nil || err2 != nil || err3 != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Failed to parse price",
+			"message": "Failed to parse price or stock",
 		})
 
 		return
@@ -108,7 +117,9 @@ func AddProduct(c *gin.Context) {
 		Description: body.Description,
 		SKU:         body.SKU,
 		Price:       float32(price),
+		Stock:       int32(stock),
 		Active:      body.Active,
+		DiscountedPrice:    float32(discountedPrice),
 		Banner:      body.Banner,
 		TypeID:      productType.ID,
 		CategoryID:  productCategory.ID,
@@ -236,7 +247,6 @@ func PermaDeleteProduct(c *gin.Context) {
 		return
 	}
 
-
 	// Deletar imagem do Cloudinary
 	res, err := cld.Admin.DeleteAssets(ctx, admin.DeleteAssetsParams{
 		PublicIDs:    []string{productBanner},
@@ -256,7 +266,7 @@ func PermaDeleteProduct(c *gin.Context) {
 	if res.Deleted == nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Erro ao deletar imagem do Cloudinary. Produto deletado com sucesso",
-			"error": res.Error.Message,
+			"error":   res.Error.Message,
 		})
 
 		return
@@ -287,4 +297,3 @@ func RestoreProduct(c *gin.Context) {
 		"message": "Produto restaurado com sucesso",
 	})
 }
-
