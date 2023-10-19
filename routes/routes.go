@@ -25,6 +25,8 @@ func HandleRequest() {
 	r.POST("/registro", controllers.Signup)
 	r.POST("/login", controllers.Login)
 	r.POST("/logout", middleware.RequireAuth, controllers.Logout)
+
+	r.GET("/produtos", controllers.GetProducts)
 	
 	r.POST("/admin/registro", middleware.RequireAdmin, controllers.AdminSignup)
 	r.POST("/admin/login", controllers.AdminLogin)
