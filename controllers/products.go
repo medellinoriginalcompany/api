@@ -100,14 +100,37 @@ func AddProduct(c *gin.Context) {
 	// Converter strings para float/int
 	price, err1 := strconv.ParseFloat(body.Price, 32)
 	stock, err2 := strconv.ParseInt(body.Stock, 10, 32)
+
+	if body.DiscountedPrice == "" {
+		body.DiscountedPrice = "0"
+	}
+
 	discountedPrice, err3 := strconv.ParseFloat(body.DiscountedPrice, 32)
 
-	if err1 != nil || err2 != nil || err3 != nil {
+	if err1 != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Failed to parse price or stock",
+			"message": "Failed to parse price",
 		})
 
 		return
+	}
+
+	if err2 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Failed to parse stock",
+		})
+
+		return
+	}
+
+	if err3 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Failed to parse discountedPrice",
+			"body":    body,
+		})
+
+		return
+
 	}
 
 	// Criar produto
@@ -206,61 +229,49 @@ func EditProduct(c *gin.Context) {
 	price, err1 := strconv.ParseFloat(body.Price, 32)
 	stock, err2 := strconv.ParseInt(body.Stock, 10, 32)
 
-	// Não converter discountedPrice para float se for vazio
-	if body.DiscountedPrice != "" {
-		discountedPrice, err3 := strconv.ParseFloat(body.DiscountedPrice, 32)
-		if err3 != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "Failed to parse discountedPrice",
-			})
-
-			return
-		}
-
-		res := database.DB.Model(&models.Product{}).Where("id = ?", &id).Updates(models.Product{
-			Name:            body.Name,
-			Description:     body.Description,
-			SKU:             body.SKU,
-			Price:           float32(price),
-			Stock:           int32(stock),
-			Active:          body.Active,
-			DiscountedPrice: float32(discountedPrice),
-			Banner:          body.Banner,
-		})
-
-		if res.Error != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "Erro ao editar produto",
-				"error":   res.Error.Error(),
-			})
-
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Produto alterado com sucesso",
-		})
-
-		return
+	if body.DiscountedPrice == "" {
+		body.DiscountedPrice = "0"
 	}
 
-	if err1 != nil || err2 != nil {
+	discountedPrice, err3 := strconv.ParseFloat(body.DiscountedPrice, 32)
+
+	if err1 != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Failed to parse price or stock",
+			"message": "Failed to parse price",
 		})
 
 		return
 	}
 
-	res := database.DB.Model(&models.Product{}).Where("id = ?", &id).Updates(models.Product{
-		Name:        body.Name,
-		Description: body.Description,
-		SKU:         body.SKU,
-		Price:       float32(price),
-		Stock:       int32(stock),
-		Active:      body.Active,
-		Banner:      body.Banner,
-	})
+	if err2 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Failed to parse stock",
+		})
+
+		return
+	}
+
+	if err3 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Failed to parse discountedPrice",
+		})
+
+		return
+	}
+
+	// Necessário para atualizar valores nulos
+	data := map[string]interface{}{
+		"name":             body.Name,
+		"description":      body.Description,
+		"sku":              body.SKU,
+		"price":            float32(price),
+		"stock":            int32(stock),
+		"active":           body.Active,
+		"discounted_price": float32(discountedPrice),
+		"banner":           body.Banner,
+	}
+
+	res := database.DB.Model(&models.Product{}).Where("id = ?", &id).Updates(data)
 
 	if res.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -269,12 +280,6 @@ func EditProduct(c *gin.Context) {
 		})
 
 		return
-	}
-
-	if res.Error == nil {
-		//? Por algum motivo que ainda não sei, tentar atualizar o discounted_price para 0 ou 0.0 não funciona
-		//? Então deve ser feito manualmente
-		database.DB.Exec("UPDATE products.products SET discounted_price = 0 WHERE id = ?", id)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
