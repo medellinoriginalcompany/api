@@ -33,7 +33,8 @@ func HandleRequest() {
 	r.POST("/admin/validar", middleware.RequireAdmin, controllers.Validate)
 
 	r.GET("/produtos", controllers.GetProducts)
-	
+	r.GET("/produtos/ativos", controllers.GetActiveProducts)
+		
 	r.POST("/admin/produtos/cadastrar-produto", middleware.RequireAdmin, controllers.AddProduct)
 	r.POST("/admin/produtos/editar-produto/:id", middleware.RequireAdmin, controllers.EditProduct)
 	r.POST("/admin/produtos/adicionar-propriedade/tamanhos", middleware.RequireAdmin, controllers.AddProductSize)
