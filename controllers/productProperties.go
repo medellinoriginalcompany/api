@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -238,5 +239,153 @@ func AddProductType(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Tipo cadastrado com sucesso",
+	})
+}
+
+func EditProductSize(c *gin.Context) {
+	var id = c.Param("id")
+
+	var body struct {
+		Name        string `json:"name"`
+		Description string `json:"description"`
+	}
+
+	if c.Bind(&body) != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Failed to read body",
+			"body":    body,
+		})
+		fmt.Println("Failed to read body")
+
+		return
+	}
+
+	result := database.DB.Model(models.ProductSize{}).Where("id = ?", &id).Updates(models.ProductSize{
+		Name: body.Name,
+		Description: body.Description,
+	})
+
+	if result.Error != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Erro ao editar tamanho",
+		})
+		fmt.Println(result.Error.Error())
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Tamanho editado com sucesso",
+	})
+}
+
+func EditProductColor(c *gin.Context) {
+	var id = c.Param("id")
+
+	var body struct {
+		Name        string `json:"name"`
+		Description string `json:"description"`
+	}
+
+	if c.Bind(&body) != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Failed to read body",
+			"body":    body,
+		})
+
+		return
+	}
+
+	var color models.ProductColor
+
+	result := database.DB.Model(&color).Where("id = ?", &id).Updates(models.ProductColor{
+		Name: body.Name,
+		Description: body.Description,
+	})
+
+	if result.Error != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Erro ao editar cor",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Cor editada com sucesso",
+	})
+}
+
+func EditProductCategory(c *gin.Context) {
+	var id = c.Param("id")
+
+	var body struct {
+		Name        string `json:"name"`
+		Description string `json:"description"`
+	}
+
+	if c.Bind(&body) != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Failed to read body",
+			"body":    body,
+		})
+
+		return
+	}
+
+	var category models.ProductCategory
+
+	result := database.DB.Model(&category).Where("id = ?", &id).Updates(models.ProductCategory{
+		Name: body.Name,
+		Description: body.Description,
+	})
+
+	if result.Error != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Erro ao editar categoria",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Categoria editada com sucesso",
+	})
+}
+
+func EditProductType(c *gin.Context) {
+	var id = c.Param("id")
+
+	var body struct {
+		Name        string `json:"name"`
+		Description string `json:"description"`
+	}
+
+	if c.Bind(&body) != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Failed to read body",
+			"body":    body,
+		})
+
+		return
+	}
+
+	var productType models.ProductType
+
+	result := database.DB.Model(&productType).Where("id = ?", &id).Updates(models.ProductType{
+		Name: body.Name,
+		Description: body.Description,
+	})
+
+	if result.Error != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Erro ao editar tipo",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Tipo editado com sucesso",
 	})
 }
