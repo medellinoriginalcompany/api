@@ -25,17 +25,17 @@ func HandleRequest() {
 	r.POST("/registro", controllers.Signup)
 	r.POST("/login", controllers.Login)
 	r.POST("/logout", middleware.RequireAuth, controllers.Logout)
+	r.POST("/validar", middleware.RequireAuth, controllers.Validate)
 
-	r.GET("/produtos", controllers.GetProducts)
-	
 	r.POST("/admin/registro", middleware.RequireAdmin, controllers.AdminSignup)
 	r.POST("/admin/login", controllers.AdminLogin)
 	r.POST("/admin/logout", middleware.RequireAdmin, controllers.AdminLogout)
-
-	r.POST("/validar", middleware.RequireAuth, controllers.Validate)
 	r.POST("/admin/validar", middleware.RequireAdmin, controllers.Validate)
+
+	r.GET("/produtos", controllers.GetProducts)
 	
-	r.POST("/admin/cadastrar-produto", middleware.RequireAdmin, controllers.AddProduct)
+	r.POST("/admin/produtos/cadastrar-produto", middleware.RequireAdmin, controllers.AddProduct)
+	r.POST("/admin/produtos/editar-produto/:id", middleware.RequireAdmin, controllers.EditProduct)
 	r.POST("/admin/produtos/adicionar-propriedade/tamanhos", middleware.RequireAdmin, controllers.AddProductSize)
 	r.POST("/admin/produtos/adicionar-propriedade/cores", middleware.RequireAdmin, controllers.AddProductColor)
 	r.POST("/admin/produtos/adicionar-propriedade/categorias", middleware.RequireAdmin, controllers.AddProductCategory)
