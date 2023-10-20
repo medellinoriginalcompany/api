@@ -102,7 +102,6 @@ func AddProduct(c *gin.Context) {
 	stock, err2 := strconv.ParseInt(body.Stock, 10, 32)
 	discountedPrice, err3 := strconv.ParseFloat(body.DiscountedPrice, 32)
 
-
 	if err1 != nil || err2 != nil || err3 != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Failed to parse price or stock",
@@ -113,18 +112,18 @@ func AddProduct(c *gin.Context) {
 
 	// Criar produto
 	product = models.Product{
-		Name:        body.Name,
-		Description: body.Description,
-		SKU:         body.SKU,
-		Price:       float32(price),
-		Stock:       int32(stock),
-		Active:      body.Active,
-		DiscountedPrice:    float32(discountedPrice),
-		Banner:      body.Banner,
-		TypeID:      productType.ID,
-		CategoryID:  productCategory.ID,
-		SizeID:      productSize.ID,
-		ColorID:     productColor.ID,
+		Name:            body.Name,
+		Description:     body.Description,
+		SKU:             body.SKU,
+		Price:           float32(price),
+		Stock:           int32(stock),
+		Active:          body.Active,
+		DiscountedPrice: float32(discountedPrice),
+		Banner:          body.Banner,
+		TypeID:          productType.ID,
+		CategoryID:      productCategory.ID,
+		SizeID:          productSize.ID,
+		ColorID:         productColor.ID,
 	}
 
 	result := database.DB.Create(&product)
@@ -172,6 +171,115 @@ func GetProduct(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"product": &product,
+	})
+}
+
+func EditProduct(c *gin.Context) {
+	id := c.Param("id")
+
+	// Pegar info do produto do corpo da req
+	var body struct {
+		Name            string `json:"name"`
+		Description     string `json:"description"`
+		SKU             string `json:"sku"`
+		Price           string `json:"price"`
+		Stock           string `json:"stock"`
+		Active          bool   `json:"active"`
+		DiscountedPrice string `json:"discountedPrice"`
+		Banner          string `json:"banner"`
+		Type            string `json:"type"`
+		Category        string `json:"category"`
+		Size            string `json:"size"`
+		Color           string `json:"color"`
+	}
+
+	if c.Bind(&body) != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Failed to read body",
+			"body":    body,
+		})
+
+		return
+	}
+
+	// Converter strings para float/int
+	price, err1 := strconv.ParseFloat(body.Price, 32)
+	stock, err2 := strconv.ParseInt(body.Stock, 10, 32)
+
+	// Não converter discountedPrice para float se for vazio
+	if body.DiscountedPrice != "" {
+		discountedPrice, err3 := strconv.ParseFloat(body.DiscountedPrice, 32)
+		if err3 != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "Failed to parse discountedPrice",
+			})
+
+			return
+		}
+
+		res := database.DB.Model(&models.Product{}).Where("id = ?", &id).Updates(models.Product{
+			Name:            body.Name,
+			Description:     body.Description,
+			SKU:             body.SKU,
+			Price:           float32(price),
+			Stock:           int32(stock),
+			Active:          body.Active,
+			DiscountedPrice: float32(discountedPrice),
+			Banner:          body.Banner,
+		})
+
+		if res.Error != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "Erro ao editar produto",
+				"error":   res.Error.Error(),
+			})
+
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Produto alterado com sucesso",
+		})
+
+		return
+	}
+
+	if err1 != nil || err2 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Failed to parse price or stock",
+		})
+
+		return
+	}
+
+	res := database.DB.Model(&models.Product{}).Where("id = ?", &id).Updates(models.Product{
+		Name:        body.Name,
+		Description: body.Description,
+		SKU:         body.SKU,
+		Price:       float32(price),
+		Stock:       int32(stock),
+		Active:      body.Active,
+		Banner:      body.Banner,
+	})
+
+	if res.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Erro ao editar produto",
+			"error":   res.Error.Error(),
+		})
+
+		return
+	}
+
+	if res.Error == nil {
+		//? Por algum motivo que ainda não sei, tentar atualizar o discounted_price para 0 ou 0.0 não funciona
+		//? Então deve ser feito manualmente
+		database.DB.Exec("UPDATE products.products SET discounted_price = 0 WHERE id = ?", id)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Produto alterado com sucesso. Desconto removido.",
+		"body":    body,
 	})
 }
 
