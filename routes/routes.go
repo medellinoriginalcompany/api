@@ -34,13 +34,17 @@ func HandleRequest() {
 
 	r.GET("/produtos", controllers.GetProducts)
 	r.GET("/produtos/ativos", controllers.GetActiveProducts)
-		
+
 	r.POST("/admin/produtos/cadastrar-produto", middleware.RequireAdmin, controllers.AddProduct)
 	r.POST("/admin/produtos/editar-produto/:id", middleware.RequireAdmin, controllers.EditProduct)
 	r.POST("/admin/produtos/adicionar-propriedade/tamanhos", middleware.RequireAdmin, controllers.AddProductSize)
 	r.POST("/admin/produtos/adicionar-propriedade/cores", middleware.RequireAdmin, controllers.AddProductColor)
 	r.POST("/admin/produtos/adicionar-propriedade/categorias", middleware.RequireAdmin, controllers.AddProductCategory)
 	r.POST("/admin/produtos/adicionar-propriedade/tipos", middleware.RequireAdmin, controllers.AddProductType)
+	r.POST("/admin/produtos/editar-propriedade/tamanhos/:id", middleware.RequireAdmin, controllers.EditProductSize)
+	r.POST("/admin/produtos/editar-propriedade/cores/:id", middleware.RequireAdmin, controllers.EditProductColor)
+	r.POST("/admin/produtos/editar-propriedade/categorias/:id", middleware.RequireAdmin, controllers.EditProductCategory)
+	r.POST("/admin/produtos/editar-propriedade/tipos/:id", middleware.RequireAdmin, controllers.EditProductType)
 	r.POST("/admin/produtos/restaurar/:id", middleware.RequireAdmin, controllers.RestoreProduct)
 
 	r.GET("/admin/produtos", middleware.RequireAdmin, controllers.GetProducts)
