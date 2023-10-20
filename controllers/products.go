@@ -176,6 +176,26 @@ func GetProducts(c *gin.Context) {
 	})
 }
 
+func GetActiveProducts(c *gin.Context) {
+	var products []models.Product
+
+	// Pegar produtos
+	res := database.DB.Joins("Category").Joins("Type").Where("active = ?", true).Find(&products)
+
+	if res.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Erro ao pegar produtos",
+			"error":   res.Error.Error(),
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"products": &products,
+	})
+}
+
 func GetProduct(c *gin.Context) {
 	// Pegar id do produto
 	id := c.Param("id")
