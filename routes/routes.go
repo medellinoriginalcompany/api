@@ -13,7 +13,7 @@ func HandleRequest() {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{
+		AllowOrigins: []string{
 			"http://localhost:5173",
 			"http://localhost:5174",
 		},
@@ -33,6 +33,7 @@ func HandleRequest() {
 	r.POST("/admin/validar", middleware.RequireAdmin, controllers.Validate)
 
 	r.GET("/produtos", controllers.GetProducts)
+	r.GET("/produtos/:id", controllers.GetProduct)
 	r.GET("/produtos/ativos", controllers.GetActiveProducts)
 
 	r.POST("/admin/produtos/cadastrar-produto", middleware.RequireAdmin, controllers.AddProduct)
@@ -51,13 +52,12 @@ func HandleRequest() {
 	r.GET("/admin/produto/:id", middleware.RequireAdmin, controllers.GetProduct)
 	r.GET("/admin/produtos/propriedades", middleware.RequireAdmin, controllers.GetProductProperties)
 	r.GET("/admin/produtos/lixeira", middleware.RequireAdmin, controllers.GetDeletedProducts)
-	
+
 	r.DELETE("/admin/deletar-produto/:id", middleware.RequireAdmin, controllers.DeleteProduct)
 	r.DELETE("/admin/produtos/deletar-permanente/:id", middleware.RequireAdmin, controllers.PermaDeleteProduct)
 	r.DELETE("/admin/deletar/:type/:id", middleware.RequireAdmin, controllers.DeleteProductProperty)
 
 	r.GET("/example", handlers.Example)
-
 
 	r.Run()
 }
