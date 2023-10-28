@@ -193,33 +193,8 @@ func GetActiveProducts(c *gin.Context) {
 		return
 	}
 
-	// Para cada produto, pegar apenas campos necessários (ID, Name, Banner, Price, DiscountedPrice)
-	var productsResponse []struct {
-		ID              int32    `json:"ID"`
-		Name            string  `json:"Name"`
-		Banner          string  `json:"Banner"`
-		Price           float32 `json:"Price"`
-		DiscountedPrice float32 `json:"DiscountedPrice"`
-	}
-
-	for _, product := range products {
-		productsResponse = append(productsResponse, struct {
-			ID              int32    `json:"ID"`
-			Name            string  `json:"Name"`
-			Banner          string  `json:"Banner"`
-			Price           float32 `json:"Price"`
-			DiscountedPrice float32 `json:"DiscountedPrice"`
-		}{
-			ID:              product.ID,
-			Name:            product.Name,
-			Banner:          product.Banner,
-			Price:           product.Price,
-			DiscountedPrice: product.DiscountedPrice,
-		})
-	}
-
 	c.JSON(http.StatusOK, gin.H{
-		"products": productsResponse,
+		"products": products,
 	})
 }
 
