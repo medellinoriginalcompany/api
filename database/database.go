@@ -32,6 +32,7 @@ func Connection() {
 		&models.ProductSize{},
 		&models.ProductColor{},
 		&models.ProductImage{},
+		&models.Products_product_size{},
 	)
 
 
