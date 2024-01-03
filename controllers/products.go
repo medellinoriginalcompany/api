@@ -147,15 +147,16 @@ func AddProduct(c *gin.Context) {
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Erro ao criar produto",
+			"error":   result.Error.Error(),
 		})
 
 		return
 	}
 
 	// Criar relação entre produto e tamanho para cada tamanho recebido
-	for _, size := range body.Sizes {
+	for sizeID, quantity := range body.Sizes {
 		var productSize models.ProductSize
-		database.DB.First(&productSize, "id = ?", size)
+		database.DB.First(&productSize, "id = ?", sizeID)
 
 		// Caso seja um tamanho inválido, pular
 		if productSize.ID == 0 {
@@ -165,6 +166,7 @@ func AddProduct(c *gin.Context) {
 		productSizeRelation := models.Products_product_size{
 			ProductID: product.ID,
 			SizeID:    productSize.ID,
+			Stock:     int32(quantity),
 		}
 
 		result := database.DB.Create(&productSizeRelation)
@@ -172,6 +174,7 @@ func AddProduct(c *gin.Context) {
 		if result.Error != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"message": "Erro ao criar relação entre produto e tamanho",
+				"error":   result.Error.Error(),
 			})
 
 			return
