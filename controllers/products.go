@@ -14,24 +14,27 @@ import (
 func AddProduct(c *gin.Context) {
 	// Pegar info do produto do corpo da req
 	var body struct {
-		Name            string `json:"name"`
-		Description     string `json:"description"`
-		SKU             string `json:"sku"`
-		Price           string `json:"price"`
-		Stock           string `json:"stock"`
-		Active          bool   `json:"active"`
-		DiscountedPrice string `json:"discountedPrice"`
-		Banner          string `json:"banner"`
-		Type            string `json:"type"`
-		Category        string `json:"category"`
-		Size            string `json:"size"`
-		Color           string `json:"color"`
+		Banner             string             `json:"banner"`
+		Name               string             `json:"name"`
+		Description        string             `json:"description"`
+		Price              string             `json:"price"`
+		DiscountPercentage string             `json:"discountPercentage"`
+		Stock              string             `json:"stock"`
+		Active             bool               `json:"active"`
+		Manufacturer       string             `json:"manufacturer"`
+		Print              string             `json:"print"`
+		Category           string             `json:"category"`
+		Type               string             `json:"type"`
+		Color              string             `json:"color"`
+		SKU                string             `json:"sku"`
+		Sizes              map[string]float32 `json:"sizes"`
 	}
 
 	if c.Bind(&body) != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Failed to read body",
 			"body":    body,
+			"message": "Falha ao ler corpo da requisição",
+			"warning": "Este é o corpo da requisição. Verifique se os campos estão corretos",
 		})
 
 		return
@@ -49,6 +52,7 @@ func AddProduct(c *gin.Context) {
 		return
 	}
 
+	// Verificar se as propriedades existem
 	var productColor models.ProductColor
 	database.DB.First(&productColor, "name = ?", body.Color)
 
@@ -85,27 +89,15 @@ func AddProduct(c *gin.Context) {
 		return
 	}
 
-	var productSize models.ProductSize
-	database.DB.First(&productSize, "name = ?", body.Size)
-
-	if productSize.ID == 0 {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Tamanho não cadastrado",
-			"body":    body,
-		})
-
-		return
-	}
-
 	// Converter strings para float/int
 	price, err1 := strconv.ParseFloat(body.Price, 32)
 	stock, err2 := strconv.ParseInt(body.Stock, 10, 32)
 
-	if body.DiscountedPrice == "" {
-		body.DiscountedPrice = "0"
+	if body.DiscountPercentage == "" {
+		body.DiscountPercentage = "0"
 	}
 
-	discountedPrice, err3 := strconv.ParseFloat(body.DiscountedPrice, 32)
+	discountPercentage, err3 := strconv.ParseFloat(body.DiscountPercentage, 32)
 
 	if err1 != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -125,7 +117,7 @@ func AddProduct(c *gin.Context) {
 
 	if err3 != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Failed to parse discountedPrice",
+			"message": "Failed to parse discountPercentage",
 			"body":    body,
 		})
 
@@ -135,18 +127,19 @@ func AddProduct(c *gin.Context) {
 
 	// Criar produto
 	product = models.Product{
-		Name:            body.Name,
-		Description:     body.Description,
-		SKU:             body.SKU,
-		Price:           float32(price),
-		Stock:           int32(stock),
-		Active:          body.Active,
-		DiscountedPrice: float32(discountedPrice),
-		Banner:          body.Banner,
-		TypeID:          productType.ID,
-		CategoryID:      productCategory.ID,
-		SizeID:          productSize.ID,
-		ColorID:         productColor.ID,
+		Banner:             body.Banner,
+		Name:               body.Name,
+		Description:        body.Description,
+		Price:              float32(price),
+		DiscountPercentage: float32(discountPercentage),
+		Stock:              int32(stock),
+		Active:             body.Active,
+		Manufacturer:       body.Manufacturer,
+		Print:              body.Print,
+		CategoryID:         productCategory.ID,
+		TypeID:             productType.ID,
+		ColorID:            productColor.ID,
+		SKU:                body.SKU,
 	}
 
 	result := database.DB.Create(&product)
@@ -157,6 +150,32 @@ func AddProduct(c *gin.Context) {
 		})
 
 		return
+	}
+
+	// Criar relação entre produto e tamanho para cada tamanho recebido
+	for _, size := range body.Sizes {
+		var productSize models.ProductSize
+		database.DB.First(&productSize, "id = ?", size)
+
+		// Caso seja um tamanho inválido, pular
+		if productSize.ID == 0 {
+			continue
+		}
+
+		productSizeRelation := models.Products_product_size{
+			ProductID: product.ID,
+			SizeID:    productSize.ID,
+		}
+
+		result := database.DB.Create(&productSizeRelation)
+
+		if result.Error != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "Erro ao criar relação entre produto e tamanho",
+			})
+
+			return
+		}
 	}
 
 	// Respond
@@ -181,8 +200,8 @@ func GetActiveProducts(c *gin.Context) {
 
 	// Pegar produtos
 	res := database.DB.Joins("Category").
-	Where("active = ?", true).
-	Find(&products)
+		Where("active = ?", true).
+		Find(&products)
 
 	if res.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
