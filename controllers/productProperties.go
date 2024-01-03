@@ -27,7 +27,6 @@ func GetProductProperties(c *gin.Context) {
 		"sizes":      sizes,
 		"types":      types,
 	})
-
 }
 
 func DeleteProductProperty(c *gin.Context) {
