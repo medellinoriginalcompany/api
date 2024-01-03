@@ -11,7 +11,7 @@ type Product struct {
 
 	Banner             string  `gorm:"type:varchar(255);notnull"`
 	Name               string  `gorm:"type:varchar(255);notnull"`
-	Description        string  `gorm:"type:varchar(255);notnull"`
+	Description        string  `gorm:"type:text;notnull"`
 	Price              float32 `gorm:"notnull"`
 	DiscountPercentage float32 `gorm:"notnull;default:0"`
 	Stock              int32   `gorm:"notnull;default:0"`
