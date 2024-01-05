@@ -19,7 +19,6 @@ func AddProduct(c *gin.Context) {
 		Description        string             `json:"description"`
 		Price              string             `json:"price"`
 		DiscountPercentage string             `json:"discountPercentage"`
-		Stock              string             `json:"stock"`
 		Active             bool               `json:"active"`
 		Manufacturer       string             `json:"manufacturer"`
 		Print              string             `json:"print"`
@@ -90,16 +89,15 @@ func AddProduct(c *gin.Context) {
 	}
 
 	// Converter strings para float/int
-	price, err1 := strconv.ParseFloat(body.Price, 32)
-	stock, err2 := strconv.ParseInt(body.Stock, 10, 32)
+	price, err := strconv.ParseFloat(body.Price, 32)
 
 	if body.DiscountPercentage == "" {
 		body.DiscountPercentage = "0"
 	}
 
-	discountPercentage, err3 := strconv.ParseFloat(body.DiscountPercentage, 32)
+	discountPercentage, err2 := strconv.ParseFloat(body.DiscountPercentage, 32)
 
-	if err1 != nil {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Failed to parse price",
 		})
@@ -109,14 +107,6 @@ func AddProduct(c *gin.Context) {
 
 	if err2 != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Failed to parse stock",
-		})
-
-		return
-	}
-
-	if err3 != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Failed to parse discountPercentage",
 			"body":    body,
 		})
@@ -125,6 +115,13 @@ func AddProduct(c *gin.Context) {
 
 	}
 
+	// Somar valores do tamanho e definir como estoque
+	var stock int32 = 0
+	for _, quantity := range body.Sizes {
+		stock += int32(quantity)
+	}
+
+
 	// Criar produto
 	product = models.Product{
 		Banner:             body.Banner,
@@ -132,7 +129,7 @@ func AddProduct(c *gin.Context) {
 		Description:        body.Description,
 		Price:              float32(price),
 		DiscountPercentage: float32(discountPercentage),
-		Stock:              int32(stock),
+		Stock:              stock,
 		Active:             body.Active,
 		Manufacturer:       body.Manufacturer,
 		Print:              body.Print,
