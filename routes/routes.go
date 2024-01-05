@@ -30,7 +30,7 @@ func HandleRequest() {
 	r.POST("/admin/registro", middleware.RequireAdmin, controllers.AdminSignup)
 	r.POST("/admin/login", controllers.AdminLogin)
 	r.POST("/admin/logout", middleware.RequireAdmin, controllers.AdminLogout)
-	r.POST("/admin/validar", middleware.RequireAdmin, controllers.Validate)
+	r.GET("/admin/validar", middleware.RequireAdmin, controllers.Validate)
 
 	r.GET("/produtos", controllers.GetProducts)
 	r.GET("/produtos/:id", controllers.GetProduct)
