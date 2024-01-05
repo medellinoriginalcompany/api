@@ -154,7 +154,7 @@ func Validate(c *gin.Context) {
 func Logout(c *gin.Context) {
 	c.SetCookie("auth_token", "", -1, "", "", true, true) // Apaga o cookie setando para um tempo negativo
 	c.JSON(http.StatusOK, gin.H{
-		"token": "Cookie deleted.",
+		"message": "Logout successfully. Cookie deleted.",
 	})
 }
 
@@ -162,15 +162,17 @@ func AdminLogout(c *gin.Context) {
 	cookie := config.Getenv("ADMIN_TOKEN")
 	c.SetCookie(cookie, "", -1, "", "", true, true) // Apaga o cookie setando para um tempo negativo
 	c.JSON(http.StatusOK, gin.H{
-		"token": "Cookie deleted.",
+		"message": "Logout successfully. Cookie deleted.",
 	})
 }
 
 func AdminLogin(c *gin.Context) {
 	// Get email e senha
 	var body struct {
-		Email    string
-		Password string
+		Credentials struct {
+			Email    string `json:"email"`
+			Password string `json:"password"`
+		} `json:"credentials"`
 	}
 
 	if c.Bind(&body) != nil {
@@ -183,18 +185,19 @@ func AdminLogin(c *gin.Context) {
 
 	// Procurar usuário
 	var user models.Admin
-	database.DB.First(&user, "email = ?", body.Email)
+	database.DB.First(&user, "email = ?", body.Credentials.Email)
 
 	if user.ID == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "Email ou senha incorretos",
+			"body":    body,
 		})
 
 		return
 	}
 
 	// Comparar hash com senha
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Credentials.Password))
 
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
